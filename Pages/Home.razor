@@ -1,0 +1,40 @@
+﻿@page "/"
+
+@attribute [Authorize]
+<PageTitle>Admin</PageTitle>
+
+<h1 class="mb-4">Välkommen!</h1>
+<p><strong>Administration för Salong Lilla Hörnan</strong></p>
+<h2>Hantera:</h2>
+<div class="">
+    <div class="row">
+        <div class="col-md-4">
+            <NavLink href="booking" class="link">
+                <div class="card mb-4">
+                    <div class="card-body">Bokningar <i class="fas fa-calendar"></i> </div>
+                </div>
+            </NavLink>
+        </div>
+        <div class="col-md-4">
+            <NavLink href="hairdresser" class="link">
+                <div class="card mb-4">
+                    <div class="card-body">Frisörer <i class="fas fa-user"></i> </div>
+                </div>
+            </NavLink>
+        </div>
+        <div class="col-md-4">
+            <NavLink href="category" class="link">
+                <div class="card mb-4">
+                    <div class="card-body">Kategorier <i class="fas fa-list-alt"></i> </div>
+                </div>
+            </NavLink>
+        </div>
+    </div>
+</div>
+<section>
+<BookingStatistics />
+</section>
+<section>
+<PriceStatistics />
+
+</section>

@@ -1,0 +1,65 @@
+@layout MainLayout
+@page "/login"
+
+@inject HttpClient Http 
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JSRuntime
+<div class="container  px-4">
+  <div class="">
+
+   <h2>Logga in</h2>
+
+   
+      <form @onsubmit="Login" class="mt-4 form-group">
+        @if (!string.IsNullOrEmpty(errorMessage)){
+    <p class="text-danger">@errorMessage</p>
+}
+
+    
+          <label for="email">Epostadres:</label>
+          <input type="email" class="form-control mb-4" id="email" placeholder="Ange användarnamn" @bind="email">
+
+   
+          <label for="password">Lösenord:</label>
+          <input type="password" class="form-control mb-4" id="password" placeholder="Ange lösenord" @bind="password">
+    
+        <button type="submit" class="btn btn-standard">Logga in</button>
+      </form>
+    </div>
+  </div>
+
+@code {
+    private string email;
+    private string password;
+    private string errorMessage;
+
+    private async Task Login(){
+            var loginModel = new {Email = email, Password = password};
+            var response = await Http.PostAsJsonAsync("http://localhost:5004/login", loginModel);
+
+            //vid lyckad inloggning
+            if(response.IsSuccessStatusCode)
+            {
+                var result = await response.Content.ReadFromJsonAsync<AuthResult>();
+
+                    //spara jwt token
+                   await JSRuntime.InvokeVoidAsync("localStorage.setItem", "authToken", result.AccessToken);
+                // Navigera användaren till /category sidan efter en lyckad inloggning
+        NavigationManager.NavigateTo("/", forceLoad: true);
+        StateHasChanged(); 
+               
+            }
+            else {
+                errorMessage = "Fel använarnamn eller lösenord";
+            }
+    }
+    
+    
+        public class AuthResult
+    {
+        public string TokenType { get; set; }
+        public string AccessToken { get; set; }
+        public int ExpiresIn { get; set; }
+        public string RefreshToken { get; set; }
+    }
+}

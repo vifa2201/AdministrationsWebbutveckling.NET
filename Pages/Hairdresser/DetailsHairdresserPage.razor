@@ -1,0 +1,155 @@
+@page "/detailhaidresser/{hairdresserId}"
+@inject NavigationManager Navigation
+@using System;
+@using System.Collections.Generic;
+@using System.ComponentModel.DataAnnotations;
+@using System.Text.Json.Serialization;
+<PageTitle>Kategoridetaljer</PageTitle>
+
+@if (hairdresser != null)
+{
+    <h1 class="mb-4">Detaljer om - @hairdresser.Name</h1>
+    <div class="row">
+        <div class="col-md">
+            <table class="table">
+                <tbody>
+                    <tr>
+                        <td>Namn:</td>
+                        <td>@hairdresser.Name</td>
+                    </tr>
+                    <tr>
+                        <td>Specialite:</td>
+                        <td>@hairdresser.Speciality</td>
+                    </tr>
+                    <tr>
+                        <td>Beskrivning:</td>
+                        <td>@hairdresser.Description </td>
+                    </tr>
+                    
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <section class="mt-4 pt-4">
+        <h2 class="mb-4">Bokningar</h2>
+      @if (hairdresser != null && hairdresser.Bookings != null && hairdresser.Bookings.Values != null && hairdresser.Bookings.Values.Any())
+        {
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Bookings datum</th>
+                        <th>Meddelande</th>
+                        <th>Hårlängd</th>
+                        <th>Hårtyp</th>
+                          
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var booking in hairdresser.Bookings.Values)
+                    {
+                        @if(!booking.Status)
+                        {
+                        <tr>
+                            <td>@booking.Time.Date.ToString("yyyy-MM-dd") kl @booking.Time.Time.ToString(@"hh\:mm")</td>
+                            <td>@booking.Message</td>
+                            <td>@booking.HairLength</td>
+                            <td>@booking.HairType</td>
+                             
+                             
+                             
+                        </tr>
+                        }
+                   
+                    }
+                </tbody>
+            </table>
+        }
+        else
+        {
+            <p class="text-danger">Inga bokningar tillgängliga</p>
+        }
+    </section>
+}
+else
+{
+    <p>Laddar...</p>
+}
+
+<button @onclick="navigateCategory" class="btn btn-standard">Tillbaka</button>
+@code
+{
+    public Hairdresser hairdresser;
+    @* public Booking booking; *@
+    [Parameter]
+    public string hairdresserId { get; set; }
+
+
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        int id = Convert.ToInt32(hairdresserId);
+        await LoadCategory(id);
+    }
+
+    private async Task LoadCategory(int hairdresserId)
+    {
+        var hairdresserWithBookings = await
+        Http.GetFromJsonAsync<Hairdresser>($"http://localhost:5004/api/Hairdresser/{hairdresserId}");
+        hairdresser = hairdresserWithBookings;
+        hairdresser.Bookings = hairdresserWithBookings.Bookings;
+    }
+
+    private void navigateCategory()
+    {
+        NavigationManager.NavigateTo("/hairdresser");
+    }
+    public class Hairdresser
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public string Description { get; set; }
+        public string Speciality { get; set; }
+
+        public string ImageName { get; set; } // Stored in the database
+        public IBrowserFile ImageFile { get; set; } // Used in the form
+
+        public BookingContainer Bookings { get; set; }
+    }
+
+    public class BookingContainer
+    {
+        [JsonPropertyName("$values")]
+        public List<Booking> Values { get; set; }
+    }
+
+    public class Booking
+    {
+        public int Id { get; set; }
+        public DateTime BookingDateTime { get; set; } = DateTime.Now;
+        public string Message { get; set; }
+        public bool Status { get; set; } = false;
+        public string HairType { get; set; }
+        public string HairLength { get; set; }
+        public int TimeId { get; set; } // Referens till TimeModel
+        public Times Time { get; set; }
+
+        public int HairdresserId { get; set; }
+
+        public int CategoryId { get; set; }
+
+        public int CustomerId { get; set; }
+
+
+    }
+    public class Times
+    {
+        public int Id { get; set; }
+        public TimeSpan Time { get; set; }
+        public bool Available { get; set; }
+        public DateTime Date { get; set; }
+    }
+
+
+}

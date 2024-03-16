@@ -1,0 +1,157 @@
+@page "/time"
+
+@attribute [Authorize]
+@using System.ComponentModel.DataAnnotations
+
+<h1 class="mb-4">Tider</h1>
+
+@if (time == null)
+{
+    <p>.</p>
+}
+else
+{
+    <p><strong>Tillgängliga tider:</strong></p>
+
+    <table class="table">
+        <thead class="thead">
+            <tr>
+                <th scope="col">Tid:</th>
+                <th scope="col">Datum:</th>
+                <th scope="col">Ledig?</th>
+                <th scope="col">Hantera:</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (time != null && time.Any(t => t.Available))
+            {
+                  @foreach (var times in time.Where(t => t.Available && t.Date >= DateTime.Today))
+                {
+                    <tr>
+                        <td>@times.Time</td>
+                        <td>@times.Date.ToShortDateString()</td>
+                        <td>Ja</td>
+                        <td>
+                            <button @onclick="() => DeleteTime(times.Id)" class="btn delete"><i class="fas fa-trash-alt"></i><span class="visually-hidden">Radera tid</span> </button>
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="4" class="text-danger">Inga lediga tider</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+<h2>Lägg till ny tid</h2>
+<div class="form-group">
+    <EditForm Model="@newTime" OnValidSubmit="AddTime">
+        <label for="time">Tid:</label>
+        <InputDate Type="InputDateType.Time" class="form-control w-50" id="time"  @bind-Value="newTime.Time" ></InputDate>
+        <br />
+        <label for="date">Datum:</label>
+        <InputDate  class="form-control w-50" @bind-Value="newTime.Date" id="date" min="@DateTime.Today.ToString("yyyy-MM-dd")" ></InputDate>
+        <br />
+        <button type="submit" class="btn btn-standard">Lägg till ny tid</button>
+    </EditForm>
+</div>
+
+
+@code {
+    private Times[] time;
+    private Times newTime = new Times();
+
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        await LoadTimes();
+        // Initialisera newTime.Date med dagens datum
+
+        newTime.Date = DateTime.Today;
+    
+    }
+
+    protected async Task LoadTimes()
+    {
+        try
+        {
+            time = await Http.GetFromJsonAsync<Times[]>("http://localhost:5004/api/Time");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Error loading times: " + ex.Message);
+        }
+    }
+
+    private async Task AddTime()
+    {
+        try
+        {
+            // Sätt Available till true
+            newTime.Available = true;
+            var json = JsonSerializer.Serialize(newTime);
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+            var authToken = await JSRuntime.InvokeAsync<string>("localStorage.getItem", "authToken");
+            Http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", authToken);
+
+            var response = await Http.PostAsync("http://localhost:5004/api/Time", content); // Anrop till rätt URL
+
+            if (response.IsSuccessStatusCode)
+            {
+                await LoadTimes();
+
+                newTime = new Times();
+                newTime.Date = DateTime.Today;
+            }
+            else
+            {
+                Console.WriteLine("Failed to add time: " + response.ReasonPhrase);
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Error adding time: " + ex.Message);
+        }
+    }
+    //radera tid
+    private async Task DeleteTime(int timeId)
+    {
+            // Hämta authToken från localStorage
+            var authToken = await JSRuntime.InvokeAsync<string>("localStorage.getItem", "authToken");
+
+            // Lägg till authToken i HTTP-headers
+            Http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", authToken);
+        var confirmed = await JSRuntime.InvokeAsync<bool>("confirm", "Är du säker på att du vill radera denna tid?");
+
+        if (confirmed)
+        {
+            try
+            {
+                var response = await Http.DeleteAsync($"http://localhost:5004/api/Time/{timeId}");
+                response.EnsureSuccessStatusCode();
+
+                // Uppdatera listan med kategorier efter att kategorin har raderats
+                await LoadTimes();
+            }
+            catch (Exception ex)
+            {
+                // Hantera eventuella fel
+            }
+        }
+    }
+    public class Times
+    {
+        public int Id { get; set; }
+            [Required(ErrorMessage = "Ange en tid")]
+        public TimeOnly Time { get; set; }
+        public bool Available { get; set; }
+                [Required(ErrorMessage = "Ange ett datum")]
+        public DateTime Date { get; set; }
+    }
+}

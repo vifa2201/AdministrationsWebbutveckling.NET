@@ -1,0 +1,65 @@
+@page "/editcategory/{categoryId}"
+<PageTitle>Redigera kategori</PageTitle>
+
+<h2>Redigera kategori</h2>
+
+@if (category == null)
+{
+    <p>Kategorin kunde inte hämtas</p>
+}
+else 
+{
+    <form @onsubmit="UpdateCategory">
+        <label for="@category.Id">Id:</label>
+        <input type="number" @bind="category.Id" id="@category.Id" class="form-control" disabled />
+        <label for="@category.Name">Namn:</label>
+        <input type="text" @bind="category.Name" id="@category.Name" class="form-control" />
+     
+        <label for="@category.Price">Pris:</label>
+        <input type="number" @bind="category.Price" id="@category.Price" class="form-control" />
+    
+ 
+        <button type="submit" class="btn btn-standard mt-4">Spara</button>
+        <a href="/category" class="btn info mt-4">Tillbaka</a>
+    </form>
+}
+
+@code {
+
+    public Category category;
+
+    [Parameter]
+    public string categoryId { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        int id = Convert.ToInt32(categoryId);
+        await LoadCategory(id);
+    }
+
+    private async Task LoadCategory(int categoryId)
+    {
+        category = await Http.GetFromJsonAsync<Category>($"http://localhost:5004/api/Category/{categoryId}");
+    }
+
+    public async Task UpdateCategory()
+    {
+            // Hämta authToken från localStorage
+            var authToken = await JSRuntime.InvokeAsync<string>("localStorage.getItem", "authToken");
+
+            // Lägg till authToken i HTTP-headers
+            Http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", authToken);
+            
+        var response = await Http.PutAsJsonAsync($"http://localhost:5004/api/Category/{category.Id}", category);
+        response.EnsureSuccessStatusCode();
+
+        NavigationManager.NavigateTo("/category");
+    }
+
+    public class Category
+    {
+        public int Id { get; set; }
+        public string? Name { get; set; }
+        public int Price { get; set; }
+    }
+}

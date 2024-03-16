@@ -1,0 +1,210 @@
+
+@page "/hairdresser"
+<PageTitle>Frisörer</PageTitle>
+@using System.ComponentModel.DataAnnotations
+<h1 class="mb-4">Frisörer</h1>
+<p><strong>Lista över salongens frisörer</strong></p>
+
+@if (hairdresser == null)
+{
+    <p>Laddar.....</p>
+}
+else
+{
+    @if (hairdresserDeleted)
+    {
+        <div class="text-danger" role="alert">
+            Frisören har raderats
+        </div>
+    }
+    @if (hairdresserAdded)
+    {
+        <div class="text-success" role="alert">
+            Frisören har lagts till
+        </div>
+    }
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">Namn:</th>
+                <th scope="col">Specialitet:</th>
+                <th scope="col">Beskrivning:</th>
+                <th scope="col">Bild:</th>
+                <th scope="col">Hantera:</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var hairdressers in hairdresser)
+            {
+                <tr>
+                    <td>@hairdressers.Name</td>
+                    <td>@hairdressers.Speciality</td>
+                    <td>@hairdressers.Description</td>
+                    <td><img src="@hairdressers.ImageName" alt="bild av frisören @hairdressers.Name" class="round-image" /></td>
+                    <td>    <button @onclick="() => DeleteHairdresser(hairdressers.Id)" class="btn delete"><i class="fas fa-trash-alt"></i><span class="visually-hidden">Radera frissör</span></button>
+                        <button @onclick="() => NavigateToEditPage(hairdressers.Id)" class="btn edit"><i class="fas fa-edit"></i><span class="visually-hidden">Redigera frissör</span></button>
+                        <button @onclick="() => NavigateToDetailsPage(hairdressers.Id)" class="btn info"><i class="fas fa-info-circle"></i><span class="visually-hidden">Detaljer om frissör</span></button></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+<h2>Lägg till frisör</h2>
+    <div class="form-group">
+<EditForm Model="@newHairdresser" OnValidSubmit="AddHairdresser">
+            <DataAnnotationsValidator />
+
+          <ValidationMessage For="@(() => newHairdresser.Name)" class="text-danger" />
+        <label for="name">Namn:</label>
+        <InputText class="form-control " id="name" @bind-Value="@newHairdresser.Name"></InputText>
+
+        <ValidationMessage For="@(() => newHairdresser.Description)" class="text-danger" />
+        <label for="description">Beskrivning:</label>
+        <InputText class="form-control " id="description" @bind-Value="newHairdresser.Description"></InputText>
+
+          <ValidationMessage For="@(() => newHairdresser.Speciality)" class="text-danger" />
+        <label for="speciality">Specialitet:</label>
+        <InputText class="form-control" id="speciality" @bind-Value="newHairdresser.Speciality"></InputText>
+        <label for="image">Bild:</label>
+        <!-- Lägg till input för att välja en bildfiler -->
+<InputFile OnChange="LoadFiles" id="image" class="form-control " ></InputFile> 
+<br>
+    <button type="submit" class="btn btn-standard">Lägg till frisör</button>
+</EditForm>
+</div>
+@code {
+    //array för frisörer
+    private Hairdresser[]? hairdresser;
+    [Inject]
+    private HttpClient httpClient { get; set; }
+    private Hairdresser newHairdresser = new Hairdresser();
+    private bool hairdresserDeleted = false;
+    private bool hairdresserAdded = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadHairdressers();
+    }
+    private async Task LoadHairdressers()
+    {
+        hairdresser = await Http.GetFromJsonAsync<Hairdresser[]>("http://localhost:5004/api/Hairdresser");
+    }
+    private string GetImageUrl(string imageName)
+    {
+        // Hämta bildrna från mappen "images" i wwwroot
+        return "../images" + imageName;
+    }
+    //post anrop
+private async Task AddHairdresser()
+{
+    try
+    {
+        
+        var formData = new MultipartFormDataContent();
+        
+        // Lägg till de alla fälten
+        formData.Add(new StringContent(newHairdresser.Name), "Name");
+        formData.Add(new StringContent(newHairdresser.Description), "Description");
+        formData.Add(new StringContent(newHairdresser.Speciality), "Speciality");
+
+        // Lägg till bildfilen
+        if (newHairdresser.ImageFile != null)
+        {
+            var fileContent = new StreamContent(newHairdresser.ImageFile.OpenReadStream(newHairdresser.ImageFile.Size));
+            formData.Add(fileContent, "ImageFile", newHairdresser.ImageFile.Name);
+        }
+
+        // Hämta authToken från localStorage
+        var authToken = await JSRuntime.InvokeAsync<string>("localStorage.getItem", "authToken");
+
+        // Lägg till authToken i HTTP-headers
+        Http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", authToken);
+
+        var response = await Http.PostAsync("http://localhost:5004/api/Hairdresser", formData);
+
+        if (response.IsSuccessStatusCode)
+        {
+            await LoadHairdressers();
+            newHairdresser = new Hairdresser();
+            StateHasChanged(); // Uppdatera komponenten
+            await Task.Delay(3000); // Vänta 3 sekunder
+            hairdresserAdded = true;
+        }
+        else
+        {
+            // Hantera fel om det finns några
+        }
+    }
+    catch (Exception ex)
+    {
+        // Hantera eventuella undantag
+    }
+}
+    // Metod för att hantera filval
+    private async Task LoadFiles(InputFileChangeEventArgs e)
+    {
+        var file = e.File;
+
+        if (file != null)
+        {
+
+            newHairdresser.ImageFile = file;
+        }
+    }
+//Skicka till uppdatera sida
+  private void NavigateToEditPage(int hairdresserId)
+    {
+        NavigationManager.NavigateTo($"/edithairdresser/{hairdresserId}");
+    }
+
+      private void NavigateToDetailsPage(int hairdresserId)
+    {
+        NavigationManager.NavigateTo($"/detailhaidresser/{hairdresserId}");
+    }
+    //Radera
+    private async Task DeleteHairdresser(int hairdresserId)
+    {
+            // Hämta authToken från localStorage
+            var authToken = await JSRuntime.InvokeAsync<string>("localStorage.getItem", "authToken");
+
+            // Lägg till authToken i HTTP-headers
+            Http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", authToken);
+        var confirmed = await JSRuntime.InvokeAsync<bool>("confirm", "Är du säker på att du vill radera denna frisör?");
+
+        if (confirmed)
+        {
+            try
+            {
+                var response = await Http.DeleteAsync($"http://localhost:5004/api/Hairdresser/{hairdresserId}");
+                response.EnsureSuccessStatusCode();
+
+                // Uppdatera listan med kategorier efter att kategorin har raderats
+                await LoadHairdressers();
+                hairdresserDeleted = true;
+            }
+            catch (Exception ex)
+            {
+                // Hantera eventuella fel
+            }
+        }
+    }
+
+    public class Hairdresser
+    {
+        public int Id { get; set; }
+          [Required(ErrorMessage = "Ange ett namn")]
+        public string? Name { get; set; }
+
+           [Required(ErrorMessage = "Ange en beskrivning")]
+        public string? Description { get; set; }
+
+    [Required(ErrorMessage = "Ange en specialite")]
+        public string? Speciality { get; set; }
+
+        public string? ImageName { get; set; } //lagras i databasen
+        public IBrowserFile? ImageFile { get; set; } // Används i formulär
+
+
+    }
+}

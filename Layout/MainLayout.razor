@@ -1,0 +1,67 @@
+﻿
+@inherits LayoutComponentBase
+
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JSRuntime
+<div class="page">
+
+    <div class="sidebar">
+        <NavMenu />
+    </div>
+
+    <main>
+          
+    
+@if (isAuthenticated)
+
+{  
+    
+    <div class="top-row px-4 p-2">
+    <a href="/" class="link">Hjälpmedel</a>
+       <a href="/" class="link" @onclick="(() => Logout())">Logga ut <i class="fas fa-lock"></i> </a>
+           </div>
+           <div class="content p-5 mt-4">
+    @Body
+    </div>
+}
+else
+{<div class="top-row px-4">
+       <a href="/login" class="link">Logga in <i class="fas fa-lock-open"></i></a>
+       </div>
+        <div class="content p-4">
+
+    <p class="text-danger p-4">Då måste logga in för att se sidan</p>
+ <Admin.Pages.Loginpage  />
+        </div>
+}
+
+             
+           
+
+    </main>
+ 
+</div>
+@code{
+     private bool isAuthenticated;
+    [Parameter] public bool IsLoginPage { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await CheckAuthentication();
+    }
+
+  private async Task CheckAuthentication()
+{
+    string token = await JSRuntime.InvokeAsync<string>("localStorage.getItem", "authToken");
+    isAuthenticated = !string.IsNullOrEmpty(token);
+    // Tillåt åtkomst till inloggningssidan
+    if (!isAuthenticated && !IsLoginPage && NavigationManager.Uri != "/login")
+    {
+        NavigationManager.NavigateTo("/login");
+    }
+}
+        private void Logout()
+{
+    NavigationManager.NavigateTo("/logout");
+}
+}

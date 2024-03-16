@@ -1,0 +1,141 @@
+@page "/detailbooking/{bookingId}"
+<PageTitle>Bokningsdetaljer</PageTitle>
+
+<h1 class="mb-4">Bokningsinformation</h1>
+ <div class="row">
+    <div class="col-md">
+      <table class="table">
+        <thead colspan="2"><strong> Boknings nr: @booking.Id</strong></thead>
+
+        <tbody>
+          <tr>
+            <td>Meddelande:</td>
+            <td>@booking.Message</td>
+          </tr>
+          <tr>
+            <td>Datum:</td>
+            <td>@booking.Time.Date.ToString("yyyy-MM-dd")</td>
+          </tr>
+          <tr>
+            <td>Tid:</td>
+            <td>@booking.Time.Time.ToString(@"hh\:mm")</td>
+          </tr>
+        <tr>
+            <td>Hårtyp:</td>
+            <td>@booking.HairType</td>
+          </tr>
+          <tr>
+                <td>Hårlängd</td>
+        <td>@booking.HairLength</td>
+          </tr>
+       <tr>
+        <td>Frisör</td>
+        <td>@booking.Hairdresser.Name</td>
+    </tr>
+        <tr>
+            <td>Kategori</td>
+                 <td> @booking.Category.Name</td>
+        </tr>
+           <tr>
+            <td>Pris:</td>
+                 <td> @booking.Category.Price kr</td>
+        </tr>
+
+        </tbody>
+      </table>
+
+
+       <table class="table">
+        <thead colspan="2"><strong> Kundinformation</strong></thead>
+
+        <tbody>
+          <tr>
+            <td>Namn:</td>
+            <td> @booking.Customer.Name</td>
+          </tr>
+          <tr>
+            <td>E-post:</td>
+            <td>@booking.Customer.Email</td>
+          </tr>
+       
+
+        </tbody>
+      </table>
+    </div>
+ </div>
+
+<button @onclick="navigateBooking" class="btn btn-standard">Tillbaka</button>
+@code 
+
+{
+  public Booking booking;
+
+    [Parameter]
+    public string bookingId { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        int id = Convert.ToInt32(bookingId);
+        await LoadBooking(id);
+    }
+
+    private async Task LoadBooking(int bookingId)
+    {
+        booking = await Http.GetFromJsonAsync<Booking>($"http://localhost:5004/api/Booking/{bookingId}");
+    }
+
+private void navigateBooking()
+{
+        NavigationManager.NavigateTo("/booking");
+}
+   public class Booking
+    {
+        public int Id { get; set; }
+        public DateTime BookingDateTime { get; set; } = DateTime.Now;
+        public string Message { get; set; }
+        public bool Status { get; set; } = false;
+        public string HairType { get; set; }
+        public string HairLength { get; set; }
+        public int TimeId { get; set; } // Referens till TimeModel
+        public Times Time { get; set; }
+        public int HairdresserId { get; set; }
+        public Hairdresser Hairdresser { get; set; }
+        public int CategoryId { get; set; }
+        public Category Category { get; set; }
+        public int CustomerId { get; set; }
+        public Customer Customer { get; set; }
+    }
+
+    public class Times
+    {
+        public int Id { get; set; }
+        public TimeSpan Time { get; set; }
+        public bool Available { get; set; }
+        public DateTime Date { get; set; }
+    }
+
+    public class Hairdresser
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public string Description { get; set; }
+        public string Speciality { get; set; }
+        public string ImageName { get; set; }
+        public object ImageFile { get; set; }
+    }
+
+    public class Category
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public decimal Price { get; set; }
+    }
+
+    public class Customer
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public string Email { get; set; }
+        public string Password { get; set; }
+    }
+}

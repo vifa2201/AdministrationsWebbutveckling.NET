@@ -1,0 +1,95 @@
+@using System.Globalization
+@using System.Net.Http
+@using System.Text.Json
+@using System.Text
+@using System.Net.Http.Json
+@using System.Net.Http.Headers;
+@using Microsoft.AspNetCore.Authorization
+@inject HttpClient Http
+@inject IJSRuntime JSRuntime
+@inject NavigationManager NavigationManager
+@attribute [Authorize]
+
+<h2>Bokningsöversikt</h2>
+
+@if (booking != null)
+{
+<table class="table">
+    <thead>
+        <tr>
+            <th scope="col">Tidsperiod</th>
+            <th scope="col">Antal bokningar</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>Denna vecka</td>
+            <td>@BookingsThisWeek</td>
+        </tr>
+        <tr>
+            <td>Denna månad</td>
+            <td>@BookingsThisMonth</td>
+        </tr>
+        <tr>
+            <td>Totalt</td>
+            <td>@TotalBookings</td>
+        </tr>
+    </tbody>
+</table>
+}
+else
+{
+    <p>Inga bokningar tillgängliga.</p>
+}
+
+@code {
+    private Booking[]? booking;
+    int BookingsThisWeek { get; set; }
+    int BookingsThisMonth { get; set; }
+    int TotalBookings { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadBookings();
+        await CalculateBookings();
+    }
+
+    private async Task LoadBookings()
+    {
+        try
+        {
+            booking = await Http.GetFromJsonAsync<Booking[]>("http://localhost:5004/api/Booking");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Error loading bookings: " + ex.Message);
+        }
+    }
+
+    private async Task CalculateBookings()
+    {
+        if (booking != null)
+        {
+            var currentDate = DateTime.Now;
+            var currentWeek = CultureInfo.CurrentCulture.Calendar.GetWeekOfYear(currentDate, CalendarWeekRule.FirstFourDayWeek, DayOfWeek.Monday);
+            var currentMonth = currentDate.Month;
+
+            BookingsThisWeek = booking.Count(b => CultureInfo.CurrentCulture.Calendar.GetWeekOfYear(b.BookingDateTime, CalendarWeekRule.FirstFourDayWeek, DayOfWeek.Monday) == currentWeek);
+            BookingsThisMonth = booking.Count(b => b.BookingDateTime.Month == currentMonth);
+            TotalBookings = booking.Length;
+        }
+    }
+
+    public class Booking
+    {
+        public int Id { get; set; }
+        public DateTime BookingDateTime { get; set; }
+        public string? Message { get; set; }
+        public bool Status { get; set; }
+        public string? HairType { get; set; }
+        public string? HairLength { get; set; }
+        public int TimeId { get; set; }
+        public int CategoryId { get; set; }
+        public int CustomerId { get; set; }
+    }
+}

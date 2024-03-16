@@ -1,0 +1,82 @@
+@using System.Net.Http
+@using System.Text.Json
+@using System.Text
+@using System.Net.Http.Json
+@using System.Net.Http.Headers;
+
+@page "/customer"
+@using Microsoft.AspNetCore.Authorization
+@inject HttpClient Http
+@inject IJSRuntime JSRuntime
+@inject NavigationManager NavigationManager
+@attribute [Authorize]
+
+<h1 class="mb-4">Kunder</h1>
+
+<p><strong>Lista över registrerade kunder</strong></p>
+
+@if(customer == null){
+    <p>Laddar.....</p>
+}
+else{
+
+
+    
+    <table class="table">
+  <thead class="thead">
+    <tr>
+      <th scope="col">ID:</th>
+      <th scope="col">Namn:</th>
+      <th scope="col">Epost:</th>
+   
+    </tr>
+  </thead>
+  <tbody>
+  
+        @foreach(var customers in customer){
+            <tr>
+                  <td>@customers.Id</td>
+                  <td>@customers.Name</td>
+                 <td>@customers.Email </td>
+        
+                  <td>
+        @* <button @onclick="() => DeleteCustomer(customers.Id)" class="btn delete"><i class="fas fa-trash-alt"></i></button>  *@
+        
+            @* <button @onclick="() => NavigateToEditPage(categories.Id)" class="btn edit"><i class="fas fa-edit"></i></button>
+      
+            <button @onclick="() => NavigateToDetailPage(categories.Id)" class="btn info"><i class="fas fa-info-circle"></i></button> *@
+        </td>
+                 </tr>
+ 
+        }
+    </tbody>
+    </table>
+}
+
+
+@code {
+    private Customer[]? customer;
+    private Customer newCustomer = new Customer();
+
+    //get anrop
+      protected override async Task OnInitializedAsync()
+    {
+        await LoadCustomers();
+    }
+
+        private async Task LoadCustomers()
+    {
+        customer = await Http.GetFromJsonAsync<Customer[]>("http://localhost:5004/api/Customer");
+    }
+
+
+    //modell
+    public class Customer
+{
+    public int Id { get; set; }
+    public string? Name { get; set; }
+    public string? Email { get; set; }
+    public string? Password { get; set; }
+
+}
+}

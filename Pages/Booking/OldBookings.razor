@@ -1,0 +1,89 @@
+
+@page "/oldbookings"
+<PageTitle>Tidigare bokningar</PageTitle>
+@attribute [Authorize]
+
+
+<h1 class="mb-4">Tidigare bokningar </h1>
+    <table class="table">
+    <thead class="thead">
+        <tr>
+            <th scope="col">Boknings id</th>
+            <th scope="col">Meddelande</th>
+            <th scope="col">Avklarad:</th>
+            <th scope="col">Datum</th>
+      
+
+        </tr>
+    </thead>
+    <tbody>
+
+<!--Sorterar utifrån id-->
+@foreach (var bookingItem in booking.OrderBy(b => b.Id))
+{
+    @if (bookingItem.Status)
+    {
+        <tr>
+            <td>@bookingItem.Id</td>
+            <td>@bookingItem.Message</td>
+            <td><i class="fas fa-check"></i> Ja</td>
+            <td>
+
+                    @bookingItem.Time.Date.ToString("yyyy-MM-dd") kl @bookingItem.Time.Time.ToString(@"hh\:mm")
+        
+            </td>
+      
+        </tr>
+    }
+}
+        </tbody>
+    </table>
+<a href="/booking" class="btn btn-standard">Tillbaka</a>
+@code{
+        //aray för bokningar
+    private Booking[]? booking;
+    private Booking newBooking = new Booking();
+    private Times[]? times;
+
+
+    //get anrop
+    private async Task LoadBookings()
+    {
+        booking = await Http.GetFromJsonAsync<Booking[]>("http://localhost:5004/api/Booking");
+    }
+
+        protected override async Task OnInitializedAsync()
+    {
+        await LoadBookings();
+    }
+
+        //klass för att ta emot bokning
+   public class Booking
+    {
+        public int Id { get; set; }
+        public DateTime BookingDateTime { get; set; } = DateTime.Now;
+        public string? Message { get; set; }
+        public bool Status { get; set; } = false;
+        public string? HairType { get; set; }
+        public string? HairLength { get; set; }
+        public int TimeId { get; set; } // Referens till TimeModel
+        public Times Time { get; set; }
+ 
+        public int HairdresserId { get; set; }
+
+        public int CategoryId { get; set; }
+
+        public int CustomerId { get; set; }
+
+    }
+
+    public class Times
+    {
+        public int Id { get; set; }
+        public TimeSpan Time { get; set; }
+        public bool Available { get; set; }
+        public DateTime Date { get; set; }
+    }
+
+
+}

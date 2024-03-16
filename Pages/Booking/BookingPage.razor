@@ -1,0 +1,210 @@
+@page "/booking"
+<PageTitle>Bokningar</PageTitle>
+
+
+<section>
+    <h1 class="mb-4">Bokningar </h1>
+    <a href="/addBooking" class="btn btn-standard mb-4 w-auto">Lägg till bokning <i class="fas fa-plus"></i> </a>
+    <a href="/oldBookings" class="btn btn-standard mb-4 w-auto">Tidigare bokningar <i class="fas fa-calendar"></i>
+    </a>
+    <h2>Aktuella bokningar</h2>
+    <p><strong>Sortera:</strong></p>
+
+    <!-- Sorteringsalternativ -->
+    <select class="form-select w-auto" aria-label="Default select example"
+        @onchange="eventArgs => SortBookings(eventArgs.Value.ToString())">
+        <option value="all">Visa alla</option>
+        <option value="today">Idag</option>
+        <option value="thisWeek">Denna vecka</option>
+        <option value="thisMonth">Denna månad</option>
+    </select>
+    @if (booking == null)
+    {
+        <p>Inga bokningar tillgängliga</p>
+    }
+    else
+    {
+
+
+        @if (bookingDeleted)
+        {
+            <div class="my-2 text-danger" role="alert">
+                Bokningen har raderats
+            </div>
+        }
+
+
+        <table class="table">
+        <thead class="thead">
+            <tr>
+                <th scope="col">Boknings id:</th>
+                <th scope="col">Avklarad?</th>
+                <th scope="col">Datum:</th>
+                <th scope="col">Hantera:</th>
+
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Utskrift av bokningar -->
+            @foreach (var bookingItem in sortedBookings.OrderBy(b => b.Time.Date).ThenBy(b => b.Time.Time))
+                {
+                    @if (!bookingItem.Status)
+                    {
+                        <tr>
+                            <td>@bookingItem.Id</td>
+                            <td class="">
+                                <input type="checkbox" id="status-@bookingItem.Id"
+                                    @onclick="() => UpdateBookingStatus(bookingItem.Id)" />
+                                <label for="status-@bookingItem.Id" class="visually-hidden">Avklarad</label>
+                            </td>
+                            <td>@bookingItem.Time.Date.ToString("yyyy-MM-dd") kl @bookingItem.Time.Time.ToString(@"hh\:mm")</td>
+                            <td>
+                                <button @onclick="() => DeleteBooking(bookingItem.Id)" class="btn delete"><i
+                                        class="fas fa-trash-alt"></i> <span class="visually-hidden">Radera bokning</span> </button>
+                                <button @onclick="() => NavigateToEditPage(bookingItem.Id)" class="btn edit"><i
+                                        class="fas fa-edit"></i><span class="visually-hidden">Redigera bokning</span> </button>
+                                <button @onclick="() => NavigateToDetailPage(bookingItem.Id)" class="btn info"><i
+                                        class="fas fa-info-circle"></i><span class="visually-hidden">Läs mer om bokning</span>
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    }
+</section>
+
+
+
+@code {
+    //Variabler för bokningar
+    private Booking[]? booking;
+    private Times[]? times;
+      private IEnumerable<Booking> sortedBookings;
+    //variabler för meddelande:
+    private bool bookingDeleted = false;
+
+    //Läser in alla bokningar
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadBookings();
+        SortBookings("all"); // Sortera och visa alla bokningar som standard
+    }
+    //get anrop
+    private async Task LoadBookings()
+    {
+        booking = await Http.GetFromJsonAsync<Booking[]>("http://localhost:5004/api/Booking");
+    }
+
+
+    //Radera bokning
+    private async Task DeleteBooking(int bookingId)
+    {
+        var confirmed = await JSRuntime.InvokeAsync<bool>("confirm", "Är du säker på att du vill radera bokningeni?");
+
+        if (confirmed)
+        {
+            try
+            {
+                var response = await Http.DeleteAsync($"http://localhost:5004/api/Booking/{bookingId}");
+                response.EnsureSuccessStatusCode();
+                bookingDeleted = true;
+                // Uppdatera listan med kategorier efter att kategorin har raderats
+
+                await LoadBookings();
+                SortBookings("all"); // Sortera och visa alla bokningar som standard
+            }
+            catch (Exception ex)
+            {
+                // Hantera eventuella fel
+            }
+        }
+    }
+    //Skickar användare till redigera sida
+    private void NavigateToEditPage(int bookingId)
+    {
+        NavigationManager.NavigateTo($"/editbooking/{bookingId}");
+    }
+
+        //Skickar användare till detalj sida
+    private void NavigateToDetailPage(int bookingId)
+    {
+        NavigationManager.NavigateTo($"/detailbooking/{bookingId}");
+    }
+    //uppdaterar bokningsstaus
+    private async Task UpdateBookingStatus(int bookingId)
+    {
+        var bookingToUpdate = booking.FirstOrDefault(b => b.Id == bookingId);
+        if (bookingToUpdate != null)
+        {
+            bookingToUpdate.Status = true; // Uppdatera statusen till true när checkboxen klickas på
+            var response = await Http.PutAsJsonAsync($"http://localhost:5004/api/Booking/{bookingId}", bookingToUpdate);
+            response.EnsureSuccessStatusCode();
+        }
+    }
+
+
+    // Metod för att sortera bokningar baserat på det valda tidsintervallet
+    private void SortBookings(string timeInterval)
+    {
+        sortedBookings = SortBookingsByTimeInterval(booking, timeInterval);
+    }
+
+    // Logigk för att hantera tidintervallen
+    private IEnumerable<Booking> SortBookingsByTimeInterval(IEnumerable<Booking> bookings, string timeInterval)
+    {
+        var currentDate = DateTime.Now.Date;
+
+        switch (timeInterval)
+        {
+            case "today":
+                return bookings.Where(b => b.Time.Date == currentDate);
+            case "thisWeek":
+                var startOfWeek = currentDate.AddDays(-(int)currentDate.DayOfWeek);
+                var endOfWeek = startOfWeek.AddDays(6);
+                return bookings.Where(b => b.Time.Date >= startOfWeek && b.Time.Date <= endOfWeek);
+            case "thisMonth":
+                var startOfMonth = new DateTime(currentDate.Year, currentDate.Month, 1);
+                var endOfMonth = startOfMonth.AddMonths(1).AddDays(-1);
+                return bookings.Where(b => b.Time.Date >= startOfMonth && b.Time.Date <= endOfMonth);
+            default:
+                return bookings;
+        }
+    }
+
+  
+
+
+    //klass för att ta emot bokning
+    public class Booking
+    {
+        public int Id { get; set; }
+        public DateTime BookingDateTime { get; set; } = DateTime.Now;
+        public string? Message { get; set; }
+        public bool Status { get; set; } = false;
+        public string? HairType { get; set; }
+        public string? HairLength { get; set; }
+        public int TimeId { get; set; } // Referens till TimeModel
+        public Times Time { get; set; }
+
+        public int HairdresserId { get; set; }
+
+        public int CategoryId { get; set; }
+
+        public int CustomerId { get; set; }
+
+    }
+
+    public class Times
+    {
+        public int Id { get; set; }
+        public TimeSpan Time { get; set; }
+        public bool Available { get; set; }
+        public DateTime Date { get; set; }
+    }
+
+
+
+
+}

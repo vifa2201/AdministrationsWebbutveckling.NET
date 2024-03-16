@@ -1,0 +1,169 @@
+
+@page "/image"
+<PageTitle>Bilder</PageTitle>
+@using System.ComponentModel.DataAnnotations
+<h1 class="mb-4">Bilder</h1>
+<p><strong>Bilder som visas på hemsidan </strong></p>
+
+@if (image == null)
+{
+    <p>Laddar.....</p>
+}
+else
+{
+    @if (imageDeleted)
+    {
+        <div class="text-danger" role="alert">
+            Bilden har raderats
+        </div>
+    }
+    @if (imageAdded)
+    {
+        <div class="text-success" role="alert">
+            Bild har lagts till
+        </div>
+    }
+
+    <table class="table">
+        <thead>
+            <tr>
+                
+                <th scope="col">Bild:</th>
+               
+                <th scope="col">Hantera:</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var images in image)
+            {
+                <tr>
+                 
+                    <td><img src="@images.ImageName" alt=" @images.ImageName" class="round-image" /></td>
+                    <td><button @onclick="() => DeleteImage(images.Id)" class="btn delete"><i class="fas fa-trash-alt"></i><span class="visually-hidden">Radera frissör</span></button></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+<h2>Ladda upp bild</h2>
+    <div class="form-group">
+<EditForm Model="@newImage" OnValidSubmit="AddImage">
+            <DataAnnotationsValidator />
+        <label for="image">Bild:</label>
+        <!-- Lägg till input för att välja en bildfiler -->
+<InputFile OnChange="LoadFiles" id="image" class="form-control " ></InputFile> 
+<br>
+    <button type="submit" class="btn btn-standard">Ladda upp bild</button>
+</EditForm>
+</div>
+@code {
+    //array för frisörer
+    private Image[]? image;
+    [Inject]
+    private HttpClient httpClient { get; set; }
+    private Image newImage = new Image();
+    private bool imageDeleted = false;
+    private bool imageAdded = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadImages();
+    }
+    private async Task LoadImages()
+    {
+        image = await Http.GetFromJsonAsync<Image[]>("http://localhost:5004/api/Image");
+    }
+    private string GetImageUrl(string imageName)
+    {
+        // Hämta bildrna från mappen "images" i wwwroot
+        return "../images" + imageName;
+    }
+    //post anrop
+private async Task AddImage()
+{
+    try
+    {
+        var formData = new MultipartFormDataContent();
+        
+    
+        // Lägg till bildfilen
+        if (newImage.ImageFile != null)
+        {
+            var fileContent = new StreamContent(newImage.ImageFile.OpenReadStream(newImage.ImageFile.Size));
+            formData.Add(fileContent, "ImageFile", newImage.ImageFile.Name);
+        }
+
+        // Hämta authToken från localStorage
+        var authToken = await JSRuntime.InvokeAsync<string>("localStorage.getItem", "authToken");
+
+        // Lägg till authToken i HTTP-headers
+        Http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", authToken);
+
+        var response = await Http.PostAsync("http://localhost:5004/api/Image", formData);
+
+        if (response.IsSuccessStatusCode)
+        {
+            await LoadImages();
+            newImage = new Image();
+
+            imageAdded = true;
+        }
+        else
+        {
+            // Hantera fel om det finns några
+        }
+    }
+    catch (Exception ex)
+    {
+        // Hantera eventuella undantag
+    }
+}
+    // Metod för att hantera filval
+    private async Task LoadFiles(InputFileChangeEventArgs e)
+    {
+        var file = e.File;
+
+        if (file != null)
+        {
+
+            newImage.ImageFile = file;
+        }
+    }
+
+    //Radera
+    private async Task DeleteImage(int imageId)
+    {
+            // Hämta authToken från localStorage
+            var authToken = await JSRuntime.InvokeAsync<string>("localStorage.getItem", "authToken");
+
+            // Lägg till authToken i HTTP-headers
+            Http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", authToken);
+        var confirmed = await JSRuntime.InvokeAsync<bool>("confirm", "Är du säker på att du vill radera denna bild?");
+
+        if (confirmed)
+        {
+            try
+            {
+                var response = await Http.DeleteAsync($"http://localhost:5004/api/Image/{imageId}");
+                response.EnsureSuccessStatusCode();
+
+                // Uppdatera listan med kategorier efter att kategorin har raderats
+                await LoadImages();
+                imageDeleted = true;
+            }
+            catch (Exception ex)
+            {
+                // Hantera eventuella fel
+            }
+        }
+    }
+
+    public class Image
+    {
+        public int Id { get; set; }
+        public string? ImageName { get; set; } //lagras i databasen
+        public IBrowserFile? ImageFile { get; set; } // Används i formulär
+
+
+    }
+}

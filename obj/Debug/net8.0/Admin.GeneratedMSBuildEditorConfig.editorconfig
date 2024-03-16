@@ -1,0 +1,119 @@
+is_global = true
+build_property.EnableAotAnalyzer = 
+build_property.EnableSingleFileAnalyzer = 
+build_property.EnableTrimAnalyzer = false
+build_property.IncludeAllContentForSelfExtract = 
+build_property.TargetFramework = net8.0
+build_property.TargetPlatformMinVersion = 
+build_property.UsingMicrosoftNETSdkWeb = 
+build_property.ProjectTypeGuids = 
+build_property.InvariantGlobalization = false
+build_property.PlatformNeutralAssembly = 
+build_property.EnforceExtendedAnalyzerRules = 
+build_property._SupportedPlatformList = browser
+build_property.RootNamespace = Admin
+build_property.RootNamespace = Admin
+build_property.ProjectDir = /Users/violafalk/Documents/Webbutveckling/NET/projekt/Admin/
+build_property.EnableComHosting = 
+build_property.EnableGeneratedComInterfaceComImportInterop = false
+build_property.RazorLangVersion = 8.0
+build_property.SupportLocalizedComponentNames = 
+build_property.GenerateRazorMetadataSourceChecksumAttributes = 
+build_property.MSBuildProjectDirectory = /Users/violafalk/Documents/Webbutveckling/NET/projekt/Admin
+build_property._RazorSourceGeneratorDebug = 
+
+[/Users/violafalk/Documents/Webbutveckling/NET/projekt/Admin/App.razor]
+build_metadata.AdditionalFiles.TargetPath = QXBwLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/violafalk/Documents/Webbutveckling/NET/projekt/Admin/Pages/Booking/AddBookingPage.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvQm9va2luZy9BZGRCb29raW5nUGFnZS5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/violafalk/Documents/Webbutveckling/NET/projekt/Admin/Pages/Booking/BookingPage.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvQm9va2luZy9Cb29raW5nUGFnZS5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/violafalk/Documents/Webbutveckling/NET/projekt/Admin/Pages/Booking/DetailsBooking.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvQm9va2luZy9EZXRhaWxzQm9va2luZy5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/violafalk/Documents/Webbutveckling/NET/projekt/Admin/Pages/Booking/EditBooking.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvQm9va2luZy9FZGl0Qm9va2luZy5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/violafalk/Documents/Webbutveckling/NET/projekt/Admin/Pages/Booking/OldBookings.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvQm9va2luZy9PbGRCb29raW5ncy5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/violafalk/Documents/Webbutveckling/NET/projekt/Admin/Pages/BookingStatistics.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvQm9va2luZ1N0YXRpc3RpY3MucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/violafalk/Documents/Webbutveckling/NET/projekt/Admin/Pages/Category/CategoryPage.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvQ2F0ZWdvcnkvQ2F0ZWdvcnlQYWdlLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/violafalk/Documents/Webbutveckling/NET/projekt/Admin/Pages/Category/DetailsCategory.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvQ2F0ZWdvcnkvRGV0YWlsc0NhdGVnb3J5LnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/violafalk/Documents/Webbutveckling/NET/projekt/Admin/Pages/Category/EditCategory.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvQ2F0ZWdvcnkvRWRpdENhdGVnb3J5LnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/violafalk/Documents/Webbutveckling/NET/projekt/Admin/Pages/Customer/Customerpage.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvQ3VzdG9tZXIvQ3VzdG9tZXJwYWdlLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/violafalk/Documents/Webbutveckling/NET/projekt/Admin/Pages/Hairdresser/DetailsHairdresserPage.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvSGFpcmRyZXNzZXIvRGV0YWlsc0hhaXJkcmVzc2VyUGFnZS5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/violafalk/Documents/Webbutveckling/NET/projekt/Admin/Pages/Hairdresser/EditHairdresserPage.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvSGFpcmRyZXNzZXIvRWRpdEhhaXJkcmVzc2VyUGFnZS5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/violafalk/Documents/Webbutveckling/NET/projekt/Admin/Pages/Hairdresser/HairdresserPage.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvSGFpcmRyZXNzZXIvSGFpcmRyZXNzZXJQYWdlLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/violafalk/Documents/Webbutveckling/NET/projekt/Admin/Pages/Home.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvSG9tZS5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/violafalk/Documents/Webbutveckling/NET/projekt/Admin/Pages/Image/ImagePage.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvSW1hZ2UvSW1hZ2VQYWdlLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/violafalk/Documents/Webbutveckling/NET/projekt/Admin/Pages/Loginpage.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvTG9naW5wYWdlLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/violafalk/Documents/Webbutveckling/NET/projekt/Admin/Pages/LogoutPage.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvTG9nb3V0UGFnZS5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/violafalk/Documents/Webbutveckling/NET/projekt/Admin/Pages/PopularCategories.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUG9wdWxhckNhdGVnb3JpZXMucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/violafalk/Documents/Webbutveckling/NET/projekt/Admin/Pages/PriceStatistics.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUHJpY2VTdGF0aXN0aWNzLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/violafalk/Documents/Webbutveckling/NET/projekt/Admin/Pages/Time/TimePage.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvVGltZS9UaW1lUGFnZS5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/violafalk/Documents/Webbutveckling/NET/projekt/Admin/_Imports.razor]
+build_metadata.AdditionalFiles.TargetPath = X0ltcG9ydHMucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/violafalk/Documents/Webbutveckling/NET/projekt/Admin/Layout/MainLayout.razor]
+build_metadata.AdditionalFiles.TargetPath = TGF5b3V0L01haW5MYXlvdXQucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = b-m5mizdx8ip
+
+[/Users/violafalk/Documents/Webbutveckling/NET/projekt/Admin/Layout/NavMenu.razor]
+build_metadata.AdditionalFiles.TargetPath = TGF5b3V0L05hdk1lbnUucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = b-ak2nf2ytal

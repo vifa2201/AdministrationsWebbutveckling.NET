@@ -1,0 +1,184 @@
+@page "/category"
+<PageTitle>Kategorier</PageTitle>
+@attribute [Authorize]
+@using System.ComponentModel.DataAnnotations
+
+<h1 class="mb-4">Kategorier</h1>
+
+
+@if (category == null)
+{
+    <p>Laddar.....</p>
+}
+else
+{
+    @if (categoryAdded)
+    {
+        <div class="text-success" role="alert">
+    Kategorin har lagts till
+</div>
+    }
+    @if (categoryDeleted)
+    {
+        <div class="text-danger" role="alert">
+    Kategorin har raderats
+</div>
+    }
+
+
+    <table class="table">
+    <thead class="thead">
+        <tr>
+            <th scope="col">Namn:</th>
+            <th scope="col">Pris:</th>
+            <th scope="col">Id:</th>
+            <th scope="col">Hantera:</th>
+        </tr>
+    </thead>
+    <tbody>
+
+        @foreach (var categories in category)
+            {
+                <tr>
+                    <td>@categories.Name</td>
+                    <td>@categories.Price kr</td>
+                    <td>@categories.Id</td>
+                    <td>
+                        <button @onclick="() => DeleteCategory(categories.Id)" class="btn delete"><i
+                                class="fas fa-trash-alt"></i><span class="visually-hidden">Radera kategori</span> </button>
+
+                        <button @onclick="() => NavigateToEditPage(categories.Id)" class="btn edit"><i
+                                class="fas fa-edit"></i><span class="visually-hidden">Redigera kategori</span> </button>
+
+                        <button @onclick="() => NavigateToDetailPage(categories.Id)" class="btn info"><i
+                                class="fas fa-info-circle"></i><span class="visually-hidden">Info om kategori</span> </button>
+                    </td>
+                </tr>
+
+            }
+        </tbody>
+
+    </table>
+}
+
+<h2>Lägg till ny kategori</h2>
+<div class="form-group">
+    <EditForm Model="@newCategory" OnValidSubmit="AddCategory">
+        <DataAnnotationsValidator />
+  <ValidationMessage For="@(() => newCategory.Name)" class="text-danger" />
+        <label for="categoryName">Namn:</label>
+      
+        <InputText @bind-Value="@newCategory.Name" id="categoryName" class="form-control"></InputText>
+            <ValidationMessage For="@(() => newCategory.Price)" class="text-danger" />
+        <label for="price">Pris:</label>
+        <InputNumber @bind-Value="@newCategory.Price" id="price" class="form-control"></InputNumber>
+
+
+        <br />
+        <button type="submit" class="btn btn-standard">Lägg till kategori</button>
+    </EditForm>
+</div>
+
+@code {
+
+    //Array för kurser
+    private Category[]? category;
+    private Category newCategory = new Category();
+
+    private bool categoryAdded = false;
+    private bool categoryDeleted = false;
+    //Get anrop
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadCategories();
+    }
+
+    private async Task LoadCategories()
+    {
+        category = await Http.GetFromJsonAsync<Category[]>("http://localhost:5004/api/Category");
+    }
+    //Post anrop
+    private async Task AddCategory()
+    {
+        try
+        {
+            var json = JsonSerializer.Serialize(newCategory);
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+            // Hämta authToken från localStorage
+            var authToken = await JSRuntime.InvokeAsync<string>("localStorage.getItem", "authToken");
+
+            // Lägg till authToken i HTTP-headers
+            Http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", authToken);
+
+            var response = await Http.PostAsync("http://localhost:5004/api/Category", content);
+
+            if (response.IsSuccessStatusCode)
+            {
+                await LoadCategories();
+                newCategory = new Category();
+                StateHasChanged(); // Uppdatera komponenten
+                await Task.Delay(3000); // Vänta 3 sekunder
+                categoryAdded = false; // Dölj meddelandet
+            }
+            else
+            {
+                // Hantera fel om det finns några
+            }
+        }
+        catch (Exception ex)
+        {
+            // Hantera eventuella undantag
+        }
+    }
+    //Radera kategori
+    private async Task DeleteCategory(int categoryId)
+    {
+        var confirmed = await JSRuntime.InvokeAsync<bool>("confirm", "Är du säker på att du vill radera denna kategori?");
+
+        if (confirmed)
+        {
+            try
+            {
+                    // Hämta authToken från localStorage
+            var authToken = await JSRuntime.InvokeAsync<string>("localStorage.getItem", "authToken");
+
+            // Lägg till authToken i HTTP-headers
+            Http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", authToken);
+                var response = await Http.DeleteAsync($"http://localhost:5004/api/Category/{categoryId}");
+                response.EnsureSuccessStatusCode();
+
+                // Uppdatera listan med kategorier efter att kategorin har raderats
+                await LoadCategories();
+                categoryDeleted = true;
+            }
+            catch (Exception ex)
+            {
+                // Hantera eventuella fel
+            }
+        }
+    }
+    //Modell för kategorier
+    private void NavigateToEditPage(int categoryId)
+    {
+        NavigationManager.NavigateTo($"/editcategory/{categoryId}");
+    }
+
+    private void NavigateToDetailPage(int categoryId)
+    {
+        NavigationManager.NavigateTo($"/detailcategory/{categoryId}");
+    }
+
+    public class Category
+    {
+        public int Id { get; set; }
+        [Required(ErrorMessage = "Ange ett namn")]
+        public string? Name { get; set; }
+        [Required]
+        [Range(1, int.MaxValue, ErrorMessage = "Priset måste vara mer än 0 kr")]
+        public int Price { get; set; }
+
+    }
+
+
+}
