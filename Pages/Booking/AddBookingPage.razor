@@ -3,74 +3,77 @@
 <h1 class="mb-4">Lägg till bokning</h1>
 @if (bookingAdded)
 {
+    //meddelande lyckad bokning
     <div class="text-success" role="alert">
     Bokningen har lagts till!
 </div>
 }
 <div class="form-group">
+    <!---Formulär för bokning-->
     <EditForm Model="@newBooking" OnValidSubmit="AddNewBooking">
         <DataAnnotationsValidator />
+
         <ValidationMessage For="@(() => newBooking.TimeId)" class="text-danger" />
         <label for="bokningId">Lediga tider</label>
-          @if (time != null)
+        @if (time != null)
+        //loopar igenom lediga tider
+        {
+            <InputSelect class="form-select" id="bokningId" @bind-Value="@newBooking.TimeId">
+                <option value="" disabled>Välj en tid</option>
+                @foreach (var t in time)
                 {
-        <InputSelect class="form-select" id="bokningId" @bind-Value="@newBooking.TimeId">
-               <option value="" disabled>Välj en tid</option>
-            @foreach (var t in time)
-            {
-                //loppar igen om alla tider och skriver ut de som är lediga
-                if (t.Available && t.Date >= DateTime.Today)
-                {
-                    <option value="@t.Id">@t.Date.ToString("yyyy-MM-dd") kl @t.Time</option>
+                    //loppar igen om alla tider och skriver ut de som är lediga
+                    if (t.Available && t.Date >= DateTime.Today)
+                    {
+                        <option value="@t.Id">@t.Date.ToString("yyyy-MM-dd") kl @t.Time</option>
+                    }
                 }
-            }
-        </InputSelect>
-}
+            </InputSelect>
+        }
         <ValidationMessage For="@(() => newBooking.HairLength)" class="text-danger" />
         <label for="hairlength">Hårlängd:</label>
         <InputSelect class="form-select " id="hairlength" @bind-Value="@newBooking.HairLength">
-      <option value="" selected >Välj en hårlängd</option>
+            <option value="" selected>Välj en hårlängd</option>
             <option value="Kort">Kort</option>
             <option value="Medel">Medel</option>
             <option value="Långt">Långt</option>
         </InputSelect>
-   <ValidationMessage For="@(() => newBooking.HairType)" class="text-danger" />
+        <ValidationMessage For="@(() => newBooking.HairType)" class="text-danger" />
         <label for="hairtype">Hårtyp:</label>
         <InputSelect class="form-select " id="hairtype" @bind-Value="@newBooking.HairType">
-    <option value="" selected>Välj en håtyp</option>
+            <option value="" selected>Välj en håtyp</option>
             <option value="Test">Tunt</option>
             <option value="Medel">Medel</option>
             <option value="Tjockt">Tjockt</option>
         </InputSelect>
         <ValidationMessage For="@(() => newBooking.Hairdresser)" class="text-danger" />
         <label for="hairdresser">Frisör:</label>
-         @if (hairdresser != null)
-                {
-        <InputSelect class="form-select " id="hairdresser" @bind-Value="@newBooking.HairdresserId">
+        @if (hairdresser != null)
+        //loppar igenom tillgängliga frislrer
+        {
+            <InputSelect class="form-select " id="hairdresser" @bind-Value="@newBooking.HairdresserId">
 
-            @foreach (var h in hairdresser)
-            {
-                <option value="@h.Id">@h.Name</option>
-            }
-        </InputSelect>
-}
+                @foreach (var h in hairdresser)
+                {
+                    <option value="@h.Id">@h.Name</option>
+                }
+            </InputSelect>
+        }
         <ValidationMessage For="@(() => newBooking.Category)" class="text-danger" />
         <label for="kategori">Kategori:</label>
         @if (category != null)
+        {
+            <InputSelect class="form-select" id="kategori" @bind-Value="@newBooking.CategoryId">
+                @foreach (var c in category)
                 {
-        <InputSelect class="form-select" id="kategori" @bind-Value="@newBooking.CategoryId">
-
-
-            @foreach (var c in category)
-            {
-                <option value="@c.Id">@c.Name</option>
-            }
-        </InputSelect>
+                    <option value="@c.Id">@c.Name</option>
+                }
+            </InputSelect>
         }
         <ValidationMessage For="@(() => newBooking.Message)" class="text-danger" />
         <label for="message">Meddelande:</label>
         <InputText name="message" id="message" class="form-control " @bind-Value="@newBooking.Message"></InputText>
-        <h2 >Kund information</h2>
+        <h2>Kund information</h2>
 
         <label>
             Är du en ny kund?
@@ -78,20 +81,24 @@
         </label>
         @if (isNewCustomer)
         {
+                    //skapar en ny kund om ej befintlig
             <div>
                 <ValidationMessage For="@(() => newCustomer.Name)" class="text-danger" />
                 <label for="customerName">Kundens namn:</label>
                 <InputText class="form-control " id="customerName" @bind-Value="@newCustomer.Name"></InputText>
 
                 <label for="customerEmail">Kundens email:</label>
-                <InputText class="form-control" type="email"  id="customerEmail" @bind-Value="@newCustomer.Email"></InputText>
+                <InputText class="form-control" type="email" id="customerEmail" @bind-Value="@newCustomer.Email">
+                </InputText>
 
                 <label for="customerPassword">Kundens lösenord:</label>
-                <InputText class="form-control " type="password"  id="customerPassword" @bind-Value="@newCustomer.Password"></InputText>
+                <InputText class="form-control " type="password" id="customerPassword" @bind-Value="@newCustomer.Password">
+                </InputText>
             </div>
         }
         else
         {
+            //använder kundens id boka
             <div>
                 <ValidationMessage For="@(() => newBooking.CustomerId)" class="text-danger" />
                 <label for="customerId">Kundens ID:</label>
@@ -105,6 +112,7 @@
 
 @code
 {
+    //variabler
     private Booking[]? booking;
     private Hairdresser[]? hairdresser;
     private Times[]? time;
@@ -114,7 +122,7 @@
     private Customer newCustomer = new Customer();
     private bool bookingAdded = false;
     private bool isNewCustomer = false;
-    
+
 
     protected override async Task OnInitializedAsync()
     {
@@ -144,34 +152,38 @@
         {
             if (isNewCustomer)
             {
+                //skapar ny kund om kunden är ny
                 var customerJson = JsonSerializer.Serialize(newCustomer);
                 var customerContent = new StringContent(customerJson, Encoding.UTF8, "application/json");
                 var customerResponse = await Http.PostAsync("http://localhost:5004/api/Customer", customerContent);
                 customerResponse.EnsureSuccessStatusCode();
-
+                //läser in den skapade kuneden
                 var createdCustomer = await customerResponse.Content.ReadFromJsonAsync<Customer>();
                 if (createdCustomer != null)
                 {
+
                     newBooking.CustomerId = createdCustomer.Id;
                 }
             }
-
+            //skapar ny bokning
             var bookingJson = JsonSerializer.Serialize(newBooking);
             var bookingContent = new StringContent(bookingJson, Encoding.UTF8, "application/json");
             var authToken = await JSRuntime.InvokeAsync<string>("localStorage.getItem", "authToken");
+            //skickar med token för autentisering
             Http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", authToken);
             var bookingResponse = await Http.PostAsync("http://localhost:5004/api/Booking", bookingContent);
 
-     if (bookingResponse.IsSuccessStatusCode)
-{
-    bookingAdded = true;
-    newBooking = new Booking();
-    StateHasChanged(); // Uppdatera gränssnittet
-}
+            if (bookingResponse.IsSuccessStatusCode)
+            {
+                //skapar bokning 
+                bookingAdded = true;
+                newBooking = new Booking();
+                StateHasChanged(); // Uppdatera gränssnittet
+            }
         }
         catch (Exception ex)
         {
-         
+
         }
     }
 
@@ -185,7 +197,7 @@
 
         [Required(ErrorMessage = "Ange en hårtyp")]
         public string? HairType { get; set; }
-             [Required(ErrorMessage = "Ange en hårlångd")]
+        [Required(ErrorMessage = "Ange en hårlångd")]
         public string? HairLength { get; set; }
         [Required(ErrorMessage = "Välj en tid")]
         public int TimeId { get; set; } // Referens till TimeModel

@@ -15,41 +15,34 @@
 
 <p><strong>Lista över registrerade kunder</strong></p>
 
-@if(customer == null){
+@if (customer == null)
+{
     <p>Laddar.....</p>
 }
-else{
-
-
-    
+else
+{
+    //utskrift av kunder
     <table class="table">
-  <thead class="thead">
-    <tr>
-      <th scope="col">ID:</th>
-      <th scope="col">Namn:</th>
-      <th scope="col">Epost:</th>
-   
-    </tr>
-  </thead>
-  <tbody>
-  
-        @foreach(var customers in customer){
-            <tr>
-                  <td>@customers.Id</td>
-                  <td>@customers.Name</td>
-                 <td>@customers.Email </td>
-        
-                  <td>
-        @* <button @onclick="() => DeleteCustomer(customers.Id)" class="btn delete"><i class="fas fa-trash-alt"></i></button>  *@
-        
-            @* <button @onclick="() => NavigateToEditPage(categories.Id)" class="btn edit"><i class="fas fa-edit"></i></button>
-      
-            <button @onclick="() => NavigateToDetailPage(categories.Id)" class="btn info"><i class="fas fa-info-circle"></i></button> *@
-        </td>
-                 </tr>
- 
-        }
-    </tbody>
+    <thead class="thead">
+        <tr>
+            <th scope="col">ID:</th>
+            <th scope="col">Namn:</th>
+            <th scope="col">Epost:</th>
+
+        </tr>
+    </thead>
+    <tbody>
+
+        @foreach (var customers in customer)
+            {
+                <tr>
+                    <td>@customers.Id</td>
+                    <td>@customers.Name</td>
+                    <td>@customers.Email </td>
+                </tr>
+
+            }
+        </tbody>
     </table>
 }
 
@@ -59,12 +52,12 @@ else{
     private Customer newCustomer = new Customer();
 
     //get anrop
-      protected override async Task OnInitializedAsync()
+    protected override async Task OnInitializedAsync()
     {
         await LoadCustomers();
     }
 
-        private async Task LoadCustomers()
+    private async Task LoadCustomers()
     {
         customer = await Http.GetFromJsonAsync<Customer[]>("http://localhost:5004/api/Customer");
     }
@@ -72,11 +65,11 @@ else{
 
     //modell
     public class Customer
-{
-    public int Id { get; set; }
-    public string? Name { get; set; }
-    public string? Email { get; set; }
-    public string? Password { get; set; }
+    {
+        public int Id { get; set; }
+        public string? Name { get; set; }
+        public string? Email { get; set; }
+        public string? Password { get; set; }
 
-}
+    }
 }
