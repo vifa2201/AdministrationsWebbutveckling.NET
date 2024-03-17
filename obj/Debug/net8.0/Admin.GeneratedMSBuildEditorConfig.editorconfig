@@ -94,16 +94,12 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvTG9nb3V0UGFnZS5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
-[/Users/violafalk/Documents/Webbutveckling/NET/projekt/Admin/Pages/PopularCategories.razor]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUG9wdWxhckNhdGVnb3JpZXMucmF6b3I=
-build_metadata.AdditionalFiles.CssScope = 
-
-[/Users/violafalk/Documents/Webbutveckling/NET/projekt/Admin/Pages/PriceStatistics.razor]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUHJpY2VTdGF0aXN0aWNzLnJhem9y
-build_metadata.AdditionalFiles.CssScope = 
-
 [/Users/violafalk/Documents/Webbutveckling/NET/projekt/Admin/Pages/Time/TimePage.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvVGltZS9UaW1lUGFnZS5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/violafalk/Documents/Webbutveckling/NET/projekt/Admin/Pages/TimeStatistics.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvVGltZVN0YXRpc3RpY3MucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
 [/Users/violafalk/Documents/Webbutveckling/NET/projekt/Admin/_Imports.razor]

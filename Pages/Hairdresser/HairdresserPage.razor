@@ -4,7 +4,7 @@
 @using System.ComponentModel.DataAnnotations
 <h1 class="mb-4">Frisörer</h1>
 <p><strong>Lista över salongens frisörer</strong></p>
-
+<!--Meddelanden-->
 @if (hairdresser == null)
 {
     <p>Laddar.....</p>
@@ -51,8 +51,10 @@ else
     </table>
 }
 <h2>Lägg till frisör</h2>
+
     <div class="form-group">
-<EditForm Model="@newHairdresser" OnValidSubmit="AddHairdresser">
+        <!---Formulär för att lägga till frisör-->
+        <EditForm Model="@newHairdresser" OnValidSubmit="AddHairdresser">
             <DataAnnotationsValidator />
 
           <ValidationMessage For="@(() => newHairdresser.Name)" class="text-danger" />
@@ -189,7 +191,7 @@ private async Task AddHairdresser()
             }
         }
     }
-
+    //klass för frisörer
     public class Hairdresser
     {
         public int Id { get; set; }

@@ -4,7 +4,7 @@
 @using System.ComponentModel.DataAnnotations
 <h1 class="mb-4">Bilder</h1>
 <p><strong>Bilder som visas på hemsidan </strong></p>
-
+<!--Meddelanden-->
 @if (image == null)
 {
     <p>Laddar.....</p>
@@ -36,6 +36,7 @@ else
         <tbody>
             @foreach (var images in image)
             {
+                //skriver ut bliderna
                 <tr>
                  
                     <td><img src="@images.ImageName" alt=" @images.ImageName" class="round-image" /></td>

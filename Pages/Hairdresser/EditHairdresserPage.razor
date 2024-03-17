@@ -5,10 +5,11 @@
 
 @if (hairdresser == null)
 {
-    <p>Kategorin kunde inte hämtas</p>
+    <p>Frisören kunde inte hämtas</p>
 }
 else 
 {
+    //formulär för att uppdatering av frisörer
     <form @onsubmit="UpdateHairdresser">
         <label for="hairdresser.Id">Id:</label>
         <input type="number" id="hairdresser.Id" class="form-control" disabled @bind="hairdresser.Id" />
@@ -31,20 +32,23 @@ else
 @code {
 
     public Hairdresser hairdresser;
-
+    //skickar med parameter
     [Parameter]
     public string hairdresserId { get; set; }
 
+    //läser in frisörer
     protected override async Task OnInitializedAsync()
     {
         int id = Convert.ToInt32(hairdresserId);
         await LoadHairdresser(id);
     }
 
+    //hämar frisörer med GET
     private async Task LoadHairdresser(int hairdresserId)
     {
         hairdresser = await Http.GetFromJsonAsync<Hairdresser>($"http://localhost:5004/api/Hairdresser/{hairdresserId}");
     }
+    //Uppdatering frisörer
     public async Task UpdateHairdresser()
 {
     try
@@ -84,6 +88,7 @@ else
         // Hantera undantag här
     }
     }
+    // Metod för att hantera filval
     private async Task LoadFiles(InputFileChangeEventArgs e)
     {
         var file = e.File;

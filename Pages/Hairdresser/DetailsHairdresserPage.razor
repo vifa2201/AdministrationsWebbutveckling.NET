@@ -33,6 +33,7 @@
 
     <section class="mt-4 pt-4">
         <h2 class="mb-4">Bokningar</h2>
+        <!--Skriver ut bokningar kopplade till frisörer-->
       @if (hairdresser != null && hairdresser.Bookings != null && hairdresser.Bookings.Values != null && hairdresser.Bookings.Values.Any())
         {
             <table class="table">
@@ -48,6 +49,7 @@
                 <tbody>
                     @foreach (var booking in hairdresser.Bookings.Values)
                     {
+                        //kollar statusen på bokningen
                         @if(!booking.Status)
                         {
                         <tr>

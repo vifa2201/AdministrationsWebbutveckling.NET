@@ -14,6 +14,7 @@
 
 @if (booking != null)
 {
+    //skriver ut boknningsstatistik
 <table class="table">
     <thead>
         <tr>
@@ -66,20 +67,23 @@ else
         }
     }
 
+//räknar ut hur mpnga bokningar per
     private async Task CalculateBookings()
     {
         if (booking != null)
         {
+            //läser in datum
             var currentDate = DateTime.Now;
             var currentWeek = CultureInfo.CurrentCulture.Calendar.GetWeekOfYear(currentDate, CalendarWeekRule.FirstFourDayWeek, DayOfWeek.Monday);
             var currentMonth = currentDate.Month;
-
+            //bokningar denna vecka 
             BookingsThisWeek = booking.Count(b => CultureInfo.CurrentCulture.Calendar.GetWeekOfYear(b.BookingDateTime, CalendarWeekRule.FirstFourDayWeek, DayOfWeek.Monday) == currentWeek);
+            //bokningar dnen månad
             BookingsThisMonth = booking.Count(b => b.BookingDateTime.Month == currentMonth);
             TotalBookings = booking.Length;
         }
     }
-
+//klass för bokningar
     public class Booking
     {
         public int Id { get; set; }
